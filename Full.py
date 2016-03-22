@@ -17,7 +17,7 @@ def connection():
 
 def curs():
     connection.ping(True)
-    return connection.cursos()
+    return connection.cursor()
 
 
             ########
@@ -130,7 +130,7 @@ def user_unfollow():
 @app.route('/db/api/user/listFollowers/', methods=['GET'])
 def user_listFollowers():
 	try:
-		cursor = curs()
+		cursor,conn = connection()
 		user = request.args['user']
 		limit = request.args.get('limit', '')
 		order = request.args.get('order', 'desc')
@@ -146,7 +146,7 @@ def user_listFollowers():
 		a = []
 		for i in tuple(t[0] for t in cursor.fetchall()):
 			a.append(get_user_info(i, connection))
-		cursor.close()
+		conn.close()
 		return jsonify(code=0, response=a)
 	except KeyError:
 		return jsonify(code=2, response='invalid json')
@@ -159,7 +159,7 @@ def user_listFollowers():
 
 @app.route('/db/api/user/listFollowing/', methods=['GET'])
 def user_listFollowing():
-	cursor = curs()
+	cursor,conn = connection()
 	try:
 		user = request.args['user']
 		limit = request.args.get('limit', '')
@@ -176,7 +176,7 @@ def user_listFollowing():
 		a = []
 		for i in tuple(t[0] for t in cursor.fetchall()):
 			a.append(get_user_info(i, connection))
-		cursor.close()
+		conn.close()
 		return jsonify(code=0, response=a)
 	except KeyError:
 		return jsonify(code=2, response='invalid json')
@@ -189,15 +189,15 @@ def user_listFollowing():
 
 @app.route('/db/api/user/updateProfile/', methods=['POST'])
 def user_update():
-	cursor = curs()
+	cursor,conn = connection()
 	try:
 		data = request.get_json()
 		name = data['name']
 		user = data['user']
 		about = data['about']
 		cursor.execute("update users set name = %s, about = %s where email = %s",(name, about, user))
-		connection.commit()
-		cursor.close()
+		conn.commit()
+		conn.close()
 		return jsonify(code=0,
 				   response=get_user_info(user, connection))
 	except KeyError:
@@ -209,7 +209,7 @@ def user_update():
 
 @app.route('/db/api/user/listPosts/', methods=['GET'])
 def user_listPosts():
-	cursor = curs()
+	cursor,conn = connection()
 	try:
 		user = request.args['user']
 		limit = request.args.get('limit', '')
@@ -227,7 +227,7 @@ def user_listPosts():
 		a = []
 		for i in tuple(t[0] for t in cursor.fetchall()):
 			a.append(get_post_info(i, connection))
-		cursor.close()
+		conn.close()
 		return jsonify(code=0, response=a)
 	except KeyError:
 		return jsonify(code=2, response='invalid json')
