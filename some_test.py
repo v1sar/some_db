@@ -764,7 +764,7 @@ def thread_listPosts():
 			query = """select * from posts p where p.thread='{}' and date >='{}' and (SUBSTRING_INDEX(mpath,'/', 1) BETWEEN
 			 (select min(mpath)-1 from (select mpath from posts where thread = '{}' and parent is null order by mpath LIMIT {} ) as t) and
 			 (select max(mpath) from (select mpath from posts where thread = '{}' and parent is null order by mpath LIMIT {} ) as t))
-			 order by SUBSTRING_INDEX(mpath, '/', 1)""".format(thread,since_date,thread,limit,thread,limit)
+			 order by SUBSTRING_INDEX(mpath, '/', 1), SUBSTRING_INDEX(mpath, '/', 2), SUBSTRING_INDEX(mpath, '/', 3), SUBSTRING_INDEX(mpath, '/', 4), SUBSTRING_INDEX(mpath, '/', 5), SUBSTRING_INDEX(mpath, '/', 6), SUBSTRING_INDEX(mpath, '/', 7)""".format(thread,since_date,thread,limit,thread,limit)
 		cursor.execute(query, query_params)
 		posts = cursor.fetchall()
 		for post in posts:
@@ -1026,4 +1026,4 @@ def index():
 	return "lol"
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(host='0.0.0.0')
