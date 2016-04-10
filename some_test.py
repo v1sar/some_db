@@ -758,8 +758,13 @@ def thread_listPosts():
 			# on p2.mpath like CONCAT(p.mpath,'%') and thread = {} and createDate between '{}' and '{}'
 			# order by p.mpath {}""".format("limit {}".format(limit) if limit != '' else '',
 			# 						thread, since_date, max_date, order)
-			query = """select * from posts p where p.thread='{}' and date >='{}'
-			 and p.mpath like order by p.date {} limit {}""".format(thread,since_date,order,limit)
+		#	SELECT * from posts where thread = 107 AND (SUBSTRING_INDEX(mpath,'/', 1) BETWEEN
+#(SELECT min(mpath) FROM (select mpath from posts where thread = 107 AND parent IS null ORDER BY mpath DESC LIMIT 4) as t) AND
+#(SELECT max(mpath) FROM (select mpath from posts where thread = 107 AND parent IS null ORDER BY mpath DESC LIMIT 3) as t)) ORDER BY SUBSTRING_INDEX(mpath, '/', 1) ASC;
+			query = """select * from posts p where p.thread='{}' and date >='{}' and (SUBSTRING_INDEX(mpath,'/', 1) BETWEEN
+			 (select min(mpath)-1 from (select mpath from posts where thread = '{}' and parent is null order by mpath LIMIT {} ) as t) and
+			 (select max(mpath) from (select mpath from posts where thread = '{}' and parent is null order by mpath LIMIT {} ) as t))
+			 order by SUBSTRING_INDEX(mpath, '/', 1)""".format(thread,since_date,thread,limit,thread,limit)
 		cursor.execute(query, query_params)
 		posts = cursor.fetchall()
 		for post in posts:
@@ -1021,4 +1026,4 @@ def index():
 	return "lol"
 
 if __name__ == '__main__':
-	app.run()
+	app.run(debug=True)
