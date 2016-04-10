@@ -742,8 +742,12 @@ def thread_listPosts():
 			if limit != '':
 				query += " limit " + limit
 		elif sort == 'tree':
-		 query = """select * from posts p where p.thread='{}' and date >=
-        '{}' order by p.date {}, p.mpath limit {}""".format(thread,since_date,order,limit)
+			if order == 'desc':
+				 query = """select * from posts p where p.thread='{}' and date >=
+		        '{}' order by SUBSTRING_INDEX(p.mpath, '/', 1) {} limit {}""".format(thread,since_date,order,limit)
+			else:
+		 		query = """select * from posts p where p.thread='{}' and date >=
+        		'{}' order by p.mpath limit {}""".format(thread,since_date,limit)
 # query = """select p2.id from posts as p join posts as p2 on p2.mpath
 # 		like CONCAT(p.mpath,'%') and p.parent is null and thread = {} and createDate between '{}' and '{}'
 # 		order by p.mpath {} {};""".format(thread, since_date, max_date, order,
