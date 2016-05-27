@@ -3,12 +3,12 @@ from _mysql_exceptions import IntegrityError
 from some_more import get_forum_info, get_user_info, get_thread_info, get_post_info, DB, right_index, DoesNotExist
 import MySQLdb
 from datetime import datetime
-
+from werkzeug.contrib.fixers import ProxyFix
 
 
 app = Flask(__name__)
 app.debug = False
-app.config['JSON_SORT_KEYS'] = False
+app.config['JSON_SORT_KEYS'] = True
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
 
@@ -1025,5 +1025,6 @@ def index():
 	get_thread_info(63, db)
 	return "lol"
 
+app.wsgi_app = ProxyFix(app.wsgi_app)
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')
